@@ -12,15 +12,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v1
         with:
-          node-version: "16"
+          bun-version: latest
 
       - name: Get version from package.json
         id: get_version
         run: |
-          VERSION=$(jq -r '.version' package.json)
+          VERSION=$(bun x jq -r '.version' package.json)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Check if tag exists

@@ -12,18 +12,15 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x, 22.x]
+        bun-version: [latest, canary]
 
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+      - name: Use Bun ${{ matrix.bun-version }}
+        uses: oven-sh/setup-bun@v1
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: "npm"
-          cache-dependency-path: "./pnpm-lock.yaml"
-      - run: npm install -g pnpm
-      - run: pnpm install
-      - run: pnpm check
-      - run: pnpm build
-      - run: pnpm build:firefox
+          bun-version: ${{ matrix.bun-version }}
+      - run: bun install
+      - run: bun run check
+      - run: bun run build
+      - run: bun run build:firefox

@@ -7,7 +7,6 @@
   import pauseIcon from "~/assets/icon/pause.png";
   import playIcon from "~/assets/icon/play.png";
   import timeUp from "~/assets/sound/time-up.wav";
-  import toDoubleDigit from "@/utils/toDoubleDigit";
   import { onMount } from "svelte";
   import { updateTime } from "../state.svelte";
 
@@ -42,14 +41,14 @@
   });
 
   const getMinutesSeconds = (time: number) => ({
-    minutes: toDoubleDigit(Math.floor((time / 60000) % 60)),
-    seconds: toDoubleDigit(Math.floor((time / 1000) % 60)),
+    minutes: String(Math.floor((time / 60000) % 60)).padStart(2, "0"),
+    seconds: String(Math.floor((time / 1000) % 60)).padStart(2, "0"),
   });
 
   const initializeTimer = (timerType: "POMODORO" | "SHORT_BREAK" | "LONG_BREAK") => {
-switch (timerType) {
+    switch (timerType) {
       case "POMODORO":
-    timeBetween = Number(pomodoro);
+        timeBetween = Number(pomodoro);
         break;
       case "SHORT_BREAK":
         timeBetween = Number(shortBreak);
