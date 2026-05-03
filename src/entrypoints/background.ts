@@ -10,8 +10,22 @@ export let completedSessions = {
 let interval: NodeJS.Timeout | null = null;
 let timeBetween: number;
 
-export default defineBackground(() => {
+export default defineBackground(async () => {
   console.log("info> started StudyMate", { id: browser.runtime.id });
+
+  try {
+    const exists = await browser.offscreen.hasDocument();
+    console.log("offscreen document exists:", exists);
+    if (!exists) {
+      await browser.offscreen.createDocument({
+        url: "/offscreen.html",
+        reasons: [chrome.offscreen.Reason.AUDIO_PLAYBACK],
+        justification: "to play time up sound when timer ends",
+      });
+    }
+  } catch (e) {
+    console.error("offscreen error:", e);
+  }
 
   const playTimer = (time: number) => {
     interval = countdown(
