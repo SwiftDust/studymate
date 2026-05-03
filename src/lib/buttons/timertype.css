@@ -7,64 +7,66 @@
     background: none;
     overflow: hidden;
     width: 300px;
-  
+
     &::after,
     &::before {
-      content: "";
-      display: block;
-      position: absolute;
-      z-index: -2;
-      width: 100%;
-      height: 100%;
-      left: 0;
-      top: 0;
-      background: #242424;
+        content: "";
+        display: block;
+        position: absolute;
+        z-index: -2;
+        width: 100%;
+        height: 100%;
+        left: 0;
+        top: 0;
+        background: #242424;
     }
     &::before {
-      z-index: -3;
-      width: 33.33%;
-      border-radius: 12px;
-      background: #747bff;
-      transition-property: left;
-      transition-duration: .5s;
+        z-index: -3;
+        width: 33.33%;
+        border-radius: 12px;
+        background: #747bff;
+        transition-property: left;
+        transition-duration: 0.5s;
     }
     label {
-      float: left;
-      width: 33.33%;
-      border-radius: 12px;
-      padding: 2px 0 4px 0;
-      text-align: center;
-      text-indent: -1.5em;
-  
-      [type="radio"] {
-        position: relative;
-        z-index: -3;
-      }
+        float: left;
+        width: 33.33%;
+        border-radius: 12px;
+        padding: 2px 0 4px 0;
+        text-align: center;
+        text-indent: -1.5em;
+
+        [type="radio"] {
+            position: relative;
+            z-index: -3;
+        }
     }
     &:has([type="radio"]:checked)::before {
-      z-index: -1;
+        z-index: -1;
     }
     &:has([data-id="1"]:checked)::before {
-      left: 1px;
+        left: 1px;
     }
     &:has([data-id="2"]:checked)::before {
-      left: 33.33%;
+        left: 33.33%;
     }
     &:has([data-id="3"]:checked)::before {
-      left: calc(66.66% - 1px);
+        left: calc(66.66% - 1px);
     }
-  }
-  body { margin: 0; }
+}
+body {
+    margin: 0;
+}
 
-@media (prefers-color-scheme: light) {
-  [data-is="multiswitch"] {
-    border: 1px solid #242424;
+:root:not([data-theme="dark"]) {
+    [data-is="multiswitch"] {
+        border: 1px solid #242424;
 
-    &::after {
-      background: #ffffff;
+        &::after {
+            background: #ffffff;
+        }
+        &::before {
+            background: #747bff;
+        }
     }
-    &::before {
-      background: #747bff;
-    }
-  }
 }

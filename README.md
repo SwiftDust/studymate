@@ -3,7 +3,7 @@
 
 Proudly powered ⚡ by <img align="center" width="20" src="https://raw.githubusercontent.com/wxt-dev/wxt/HEAD/docs/public/hero-logo.svg" alt="WXT Logo"> [WXT](https://wxt.dev) and <img align="center" width= "20" src="https://github.com/sveltejs/svelte.dev/blob/main/apps/svelte.dev/static/images/svelte-android-chrome-192.png?raw=true" alt="Svelte Logo"> [Svelte](https://svelte.dev).
 
-Made with ❤️ for <img src="https://github.com/user-attachments/assets/a7da63c4-eb4b-4fe6-b048-e441d1cb86d9" width="20"> [High Seas](https://highseas.hackclub.com), a collaboration between GitHub and Hack Club for teenagers to build projects and get free stuff.
+Made with ❤️ for <img src="https://github.com/user-attachments/assets/a7da63c4-eb4b-4fe6-b048-e441d1cb86d9" width="20"> [Hack Club the Game](https://game.hackclub.com) (QoL improvements and new features from original High Seas ship)
 
 ## Features
 Currently, the app is in development. Right now, there's a cute little pixel art pomodoro timer with the features to switch from timer and track the amount of finished timers.
@@ -11,7 +11,7 @@ Currently, the app is in development. Right now, there's a cute little pixel art
 _Coming soon 👀_: User settings, an option to block websites, a logo (of course!) a parrot which randomly blurts out motivational quotes(?) -- enough reason to stay tuned!
 
 ## Demo video
-<video width="600" controls src="./static/studymate-v0.1.4-demo.mp4" type="video/mp4">
+<video width="600" controls src="/static/studymate-v0.1.4-demo.mp4" type="video/mp4">
     Your browser does not support the video tag.
 </video>
 
@@ -19,7 +19,13 @@ _Coming soon 👀_: User settings, an option to block websites, a logo (of cours
 ![StudyMate Dark Mode](./static/studymate-v0.1.4-dark-mode.png)
 ![StudyMate Light Mode](./static/studymate-v0.1.4-light-mode.png)
 
-## How do *I* use this?
+## Development
+1. Make sure you have npm and pnpm.
+2. Install dependencies with `pnpm i`.
+3. Run development server with `pnpm run dev`.
+
+
+## Installing
 If you're a developer, you can zip the extension with `pnpm zip`. If you have no idea what that means, please continue.
 
 ### Installing through a ZIP file
