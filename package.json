@@ -3,7 +3,7 @@
   "displayName": "StudyMate — ADHD-friendly study timer",
   "description": "StudyMate — Pomodoro timer 🍅, motivational quotes 💬 and a funny parrot 🦜 to help you study more effectively",
   "private": true,
-  "version": "0.1.4",
+  "version": "0.1.5",
   "type": "module",
   "scripts": {
     "dev": "wxt",
@@ -13,16 +13,20 @@
     "zip": "wxt zip",
     "zip:firefox": "wxt zip -b firefox",
     "check": "svelte-check --tsconfig ./tsconfig.json",
+    "test": "vitest",
     "postinstall": "wxt prepare"
   },
   "devDependencies": {
     "@tsconfig/svelte": "^5.0.8",
     "@types/chrome": "^0.0.280",
-    "@wxt-dev/module-svelte": "^2.0.5",
-    "svelte": "^5.55.5",
-    "svelte-check": "^4.4.7",
+    "@wxt-dev/module-svelte": "^2.0.0",
+    "@vitest/browser": "^1.4.0",
+    "happy-dom": "^13.9.0",
+    "svelte": "^5.1.16",
+    "svelte-check": "^4.0.7",
     "tslib": "^2.8.1",
-    "typescript": "^5.9.3",
-    "wxt": "^0.19.29"
+    "typescript": "^5.6.3",
+    "vitest": "^1.4.0",
+    "wxt": "^0.19.13"
   }
 }

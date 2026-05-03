@@ -6,8 +6,6 @@
  * @returns The interval ID which can be used to clear the interval.
  */
 
-import toDoubleDigit from "./toDoubleDigit";
-
 export function countdown(
   time: number,
   onUpdate?: (timeBetween: number) => void,
