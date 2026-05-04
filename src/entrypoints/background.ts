@@ -1,5 +1,5 @@
 import { countdown } from "@/utils/countdown";
-import toDoubleDigit from "@/utils/toDoubleDigit";
+import { completedSessionsStorage, sessionsLastUpdated } from "@/utils/storage";
 
 export let timerType: "POMODORO" | "SHORT_BREAK" | "LONG_BREAK" = "POMODORO";
 export let completedSessions = {
@@ -11,19 +11,37 @@ export let completedSessions = {
 let interval: NodeJS.Timeout | null = null;
 let timeBetween: number;
 
-export default defineBackground(() => {
+const sameLocalDay = (a: Date, b: Date) =>
+  a.getFullYear() === b.getFullYear() &&
+  a.getMonth() === b.getMonth() &&
+  a.getDate() === b.getDate();
+
+export default defineBackground(async () => {
   console.log("info> started StudyMate", { id: browser.runtime.id });
 
-  const getMinutesSeconds = (time: number) => {
-    const minutes = toDoubleDigit(Math.floor(time / 60000) % 60);
-    const seconds = toDoubleDigit(Math.floor(time / 1000) % 60);
-    return { minutes, seconds };
-  };
+  try {
+    const exists = await browser.offscreen.hasDocument();
+    if (!exists) {
+      await browser.offscreen.createDocument({
+        url: "/offscreen.html",
+        reasons: [chrome.offscreen.Reason.AUDIO_PLAYBACK],
+        justification: "to play time up sound when timer ends",
+      });
+    }
+  } catch (e) {
+    console.error("offscreen error:", e);
+  }
 
-  const updateTimer = (time: number) => {
-    let { minutes, seconds } = getMinutesSeconds(time);
-    return `${minutes}:${seconds}`;
-  };
+  completedSessions = await completedSessionsStorage.getValue();
+  const lastUpdated = await sessionsLastUpdated.getValue();
+  const now = new Date();
+  if (!sameLocalDay(lastUpdated, now)) {
+    completedSessions = {
+      completedPomodoros: 0,
+      completedShortBreaks: 0,
+      completedLongBreaks: 0,
+    };
+  }
 
   const playTimer = (time: number) => {
     interval = countdown(
@@ -32,10 +50,20 @@ export default defineBackground(() => {
         timeBetween = remainingTime;
         browser.runtime.sendMessage({
           type: "UPDATE_TIMER",
-          time: updateTimer(timeBetween),
+          timeValue: remainingTime,
         });
       },
-      () => {        
+      async () => {
+        const now = new Date();
+        const lastUpdated = await sessionsLastUpdated.getValue();
+        if (!sameLocalDay(lastUpdated, now)) {
+          completedSessions = {
+            completedPomodoros: 0,
+            completedShortBreaks: 0,
+            completedLongBreaks: 0,
+          };
+        }
+
         if (timerType === "POMODORO") {
           completedSessions.completedPomodoros += 1;
         } else if (timerType === "SHORT_BREAK") {
@@ -44,11 +72,11 @@ export default defineBackground(() => {
           completedSessions.completedLongBreaks += 1;
         }
 
-        browser.runtime.sendMessage({ 
-          type: "RESET_TIMER", 
-          completedSessions: completedSessions 
+        browser.runtime.sendMessage({
+          type: "RESET_TIMER",
+          completedSessions: completedSessions,
         });
-      }
+      },
     );
   };
 
@@ -61,13 +89,16 @@ export default defineBackground(() => {
       sendResponse({ timerType, completedSessions });
     } else if (message.type === "START_TIMER") {
       playTimer(message.time);
-      sendResponse({ status: "timerStarted", time: updateTimer(message.time) });
+      sendResponse({ status: "timerStarted", time: message.time });
     } else if (message.type === "PAUSE_TIMER") {
       pauseTimer();
-      sendResponse({ status: "timerPaused", time: updateTimer(message.time) });
+      sendResponse({ status: "timerPaused", time: message.time });
     } else if (message.type === "INIT_TIMER") {
       timerType = message.timerType;
-      browser.runtime.sendMessage({ type: "INIT_TIMER", timerType: message.timerType });
+      browser.runtime.sendMessage({
+        type: "INIT_TIMER",
+        timerType: message.timerType,
+      });
     }
 
     return true;

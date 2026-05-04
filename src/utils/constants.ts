@@ -2,7 +2,8 @@
  * @readonly The app-wide default constants
  */
 
-export const PROD = false; // Set to false for development/testing
+// production environment variable, defaults to false unless explicitly set (this happens in CI right now)
+export const PROD = import.meta.env.VITE_STUDYMATE_PROD === "true";
 
 let pomodoroTime: number;
 let shortBreakTime: number;

@@ -2,27 +2,33 @@
     import './timertype.css';
     import './Start.svelte';
 
+    import { onMount } from "svelte";
+
     interface Props {
         timerType?: "POMODORO" | "SHORT_BREAK" | "LONG_BREAK";
         buttonState?: "START" | "PAUSE";
         completedSessions?: any;
     }
 
-    let { timerType = $bindable("POMODORO"), buttonState = $bindable("START"), completedSessions = $bindable({
-      completedPomodoros: 0,
-      completedShortBreaks: 0,
-      completedLongBreaks: 0
-    }) }: Props = $props();
+    let { 
+        timerType = $bindable("POMODORO"), 
+        buttonState = $bindable("START"), 
+        completedSessions = $bindable({
+        completedPomodoros: 0,
+        completedShortBreaks: 0,
+        completedLongBreaks: 0
+        }) 
+    }: Props = $props();
 
-
-    // Listen for RESET_TIMER messages to manually update the UI
-    $effect(() => {
-        browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    onMount(() => {
+        const onMessage = (message: any) => {
             if (message.type === "RESET_TIMER" && message.completedSessions) {
-                // Force an update of completedSessions
                 completedSessions = { ...message.completedSessions };
             }
-        });
+        };
+
+        browser.runtime.onMessage.addListener(onMessage);
+        return () => browser.runtime.onMessage.removeListener(onMessage);
     });
 
     const timerOptions = [
