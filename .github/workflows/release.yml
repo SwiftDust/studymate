@@ -32,6 +32,8 @@ jobs:
         run: bun install
 
       - name: Zip the extension files
+        env:
+          VITE_STUDYMATE_PROD: "true"
         run: |
           bun run zip
           bun run zip:firefox

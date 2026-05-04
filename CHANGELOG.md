@@ -1,7 +1,13 @@
 ## Changelog
 
+- Added a switch where you can switch to light and dark mode, and auto-syncing with device theme to select the default one.
+- Made finished timers persist in `localstorage`, and reset after midnight in your local timezone
+
+### Minor changes
+
 - Fixed refresh (issue #1) so the extension can be kept open all the time without any problems
-- Rewrote to Svelte 5
+- Upgraded to Svelte 5
+- Change GitHub action worker to Bun
 
 <details>
 <summary>Looking for older changelogs? Click here!</summary>
