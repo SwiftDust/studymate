@@ -4,7 +4,7 @@ _Need a little help with studying? Always get distracted way too easily? StudyMa
 
 Proudly powered ⚡ by <img align="center" width="20" src="https://raw.githubusercontent.com/wxt-dev/wxt/HEAD/docs/public/hero-logo.svg" alt="WXT Logo"> [WXT](https://wxt.dev) and <img align="center" width= "20" src="https://github.com/sveltejs/svelte.dev/blob/main/apps/svelte.dev/static/images/svelte-android-chrome-192.png?raw=true" alt="Svelte Logo"> [Svelte](https://svelte.dev).
 
-Made with ❤️ for <img src="https://github.com/user-attachments/assets/a7da63c4-eb4b-4fe6-b048-e441d1cb86d9" width="20"> [Hack Club the Game](https://game.hackclub.com) (QoL improvements and new features from original High Seas ship)
+Made with ❤️ for <img src="./static/hctg.svg"> [Hack Club the Game](https://game.hackclub.com) (QoL improvements and new features from original High Seas ship)
 
 ## Features
 
@@ -23,18 +23,14 @@ _Coming soon 👀_: User settings, an option to block websites, a logo (of cours
 ![StudyMate Dark Mode](./static/studymate-v0.1.4-dark-mode.png)
 ![StudyMate Light Mode](./static/studymate-v0.1.4-light-mode.png)
 
-<<<<<<< HEAD
 ## Development
+
 1. Make sure you have npm and pnpm.
 2. Install dependencies with `pnpm i`.
 3. Run development server with `pnpm run dev`.
 
-
 ## Installing
-=======
-## How do _I_ use this?
 
->>>>>>> 5e366f7a40a0a5fdda9f0aecb8d8593f3c7e1282
 If you're a developer, you can zip the extension with `pnpm zip`. If you have no idea what that means, please continue.
 
 ### Installing through a ZIP file
