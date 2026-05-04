@@ -1,16 +1,21 @@
-name: Tag with release when new PR is opened, synchronized, or reopened
+name: Tag release version when PR is merged
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [closed]
 
 jobs:
   tag-version:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Bun
         uses: oven-sh/setup-bun@v1
@@ -21,23 +26,24 @@ jobs:
         id: get_version
         run: |
           VERSION=$(bun x jq -r '.version' package.json)
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Fetch tags
+        run: git fetch --tags --force
 
       - name: Check if tag exists
         id: check_tag
         run: |
-          if git rev-parse "v${{ steps.get_version.outputs.VERSION }}" >/dev/null 2>&1; then
-            echo "Tag exists"
-            echo "TAG_EXISTS=true" >> $GITHUB_ENV
+          if git rev-parse "v${{ steps.get_version.outputs.version }}" >/dev/null 2>&1; then
+            echo "tag_exists=true" >> $GITHUB_OUTPUT
           else
-            echo "Tag does not exist"
-            echo "TAG_EXISTS=false" >> $GITHUB_ENV
+            echo "tag_exists=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Create tag
-        if: github.event.pull_request.merged == true && steps.check_tag.outputs.TAG_EXISTS == 'false'
+        if: steps.check_tag.outputs.tag_exists == 'false'
         run: |
-          git config --global user.name "${{ github.actor }}"
-          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-          git tag "v${{ steps.get_version.outputs.VERSION }}"
-          git push origin "v${{ steps.get_version.outputs.VERSION }}"
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          git tag "v${{ steps.get_version.outputs.version }}"
+          git push origin "v${{ steps.get_version.outputs.version }}"
