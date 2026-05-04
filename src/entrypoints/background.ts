@@ -1,4 +1,5 @@
 import { countdown } from "@/utils/countdown";
+import { completedSessionsStorage } from "@/utils/storage";
 
 export let timerType: "POMODORO" | "SHORT_BREAK" | "LONG_BREAK" = "POMODORO";
 export let completedSessions = {
@@ -15,7 +16,6 @@ export default defineBackground(async () => {
 
   try {
     const exists = await browser.offscreen.hasDocument();
-    console.log("offscreen document exists:", exists);
     if (!exists) {
       await browser.offscreen.createDocument({
         url: "/offscreen.html",
@@ -26,6 +26,8 @@ export default defineBackground(async () => {
   } catch (e) {
     console.error("offscreen error:", e);
   }
+
+  completedSessions = await completedSessionsStorage.getValue();
 
   const playTimer = (time: number) => {
     interval = countdown(

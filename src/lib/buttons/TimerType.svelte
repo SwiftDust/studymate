@@ -2,6 +2,8 @@
     import './timertype.css';
     import './Start.svelte';
 
+    import { onMount } from "svelte";
+
     interface Props {
         timerType?: "POMODORO" | "SHORT_BREAK" | "LONG_BREAK";
         buttonState?: "START" | "PAUSE";
@@ -18,12 +20,15 @@
         }) 
     }: Props = $props();
 
-    $effect(() => {
-        browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    onMount(() => {
+        const onMessage = (message: any) => {
             if (message.type === "RESET_TIMER" && message.completedSessions) {
                 completedSessions = { ...message.completedSessions };
             }
-        });
+        };
+
+        browser.runtime.onMessage.addListener(onMessage);
+        return () => browser.runtime.onMessage.removeListener(onMessage);
     });
 
     const timerOptions = [

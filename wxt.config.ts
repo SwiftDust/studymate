@@ -7,6 +7,6 @@ export default defineConfig({
   modules: ["@wxt-dev/module-svelte"],
   manifest: {
     name: "StudyMate",
-    permissions: ["offscreen"],
+    permissions: ["offscreen", "storage"],
   },
 });

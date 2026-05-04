@@ -71,10 +71,10 @@
 
     initializeTimer(timerType);
 
-    $effect(() => {
-        browser.runtime.onMessage.addListener((message) => {
+    onMount(() => {
+        const onMessage = (message: any) => {
             if (message.type === "RESET_TIMER") {
-                completedSessions = message.completedSessions;
+                if (message.completedSessions) completedSessions = message.completedSessions;
                 resetTimer();
             } else if (message.type === "INIT_TIMER") {
                 initializeTimer(message.timerType);
@@ -95,7 +95,10 @@
                     updateTime(minutes, seconds);
                 }
             }
-        });
+        };
+
+        browser.runtime.onMessage.addListener(onMessage);
+        return () => browser.runtime.onMessage.removeListener(onMessage);
     });
 
     $effect(() => {
