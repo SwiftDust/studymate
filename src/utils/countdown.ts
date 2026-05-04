@@ -9,7 +9,7 @@
 export function countdown(
   time: number,
   onUpdate?: (timeBetween: number) => void,
-  onFinish?: () => void,
+  onFinish?: () => void | Promise<void>,
 ): NodeJS.Timeout {
   let now = Date.now();
   let completed = now + time;
@@ -21,7 +21,7 @@ export function countdown(
 
     if (timeBetween <= 0) {
       clearInterval(countdown);
-      if (onFinish) onFinish();
+      if (onFinish) void onFinish();
     }
   }, 500);
 

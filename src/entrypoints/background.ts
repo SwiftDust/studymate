@@ -1,5 +1,5 @@
 import { countdown } from "@/utils/countdown";
-import { completedSessionsStorage } from "@/utils/storage";
+import { completedSessionsStorage, sessionsLastUpdated } from "@/utils/storage";
 
 export let timerType: "POMODORO" | "SHORT_BREAK" | "LONG_BREAK" = "POMODORO";
 export let completedSessions = {
@@ -10,6 +10,11 @@ export let completedSessions = {
 
 let interval: NodeJS.Timeout | null = null;
 let timeBetween: number;
+
+const sameLocalDay = (a: Date, b: Date) =>
+  a.getFullYear() === b.getFullYear() &&
+  a.getMonth() === b.getMonth() &&
+  a.getDate() === b.getDate();
 
 export default defineBackground(async () => {
   console.log("info> started StudyMate", { id: browser.runtime.id });
@@ -28,6 +33,15 @@ export default defineBackground(async () => {
   }
 
   completedSessions = await completedSessionsStorage.getValue();
+  const lastUpdated = await sessionsLastUpdated.getValue();
+  const now = new Date();
+  if (!sameLocalDay(lastUpdated, now)) {
+    completedSessions = {
+      completedPomodoros: 0,
+      completedShortBreaks: 0,
+      completedLongBreaks: 0,
+    };
+  }
 
   const playTimer = (time: number) => {
     interval = countdown(
@@ -39,7 +53,17 @@ export default defineBackground(async () => {
           timeValue: remainingTime,
         });
       },
-      () => {
+      async () => {
+        const now = new Date();
+        const lastUpdated = await sessionsLastUpdated.getValue();
+        if (!sameLocalDay(lastUpdated, now)) {
+          completedSessions = {
+            completedPomodoros: 0,
+            completedShortBreaks: 0,
+            completedLongBreaks: 0,
+          };
+        }
+
         if (timerType === "POMODORO") {
           completedSessions.completedPomodoros += 1;
         } else if (timerType === "SHORT_BREAK") {
