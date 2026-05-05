@@ -65,6 +65,13 @@ h1 {
     margin-top: 2rem;
 }
 
+.pomodoro {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.25rem;
+    margin-bottom: 1.25rem;
+}
+
 .spacer {
     flex: 1;
 }

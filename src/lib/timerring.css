@@ -1,0 +1,60 @@
+.ring {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  height: 176px;
+  width: 176px;
+  border-radius: 50%;
+}
+
+.ring::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 8px solid transparent;
+  background: conic-gradient(
+      #a7a7a7 0,
+      #a7a7a7 calc(100% - var(--countdown)),
+      #747bff calc(100% - var(--countdown))
+    )
+    border-box;
+  mask:
+    linear-gradient(#fff 0 0) padding-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.ring::after {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #747bff;
+  top: 0;
+  left: calc(50% - 4px);
+  transform-origin: 50% 88px;
+  transform: rotate(var(--cap-angle));
+  pointer-events: none;
+}
+
+.ring > * {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+}
+
+@property --countdown {
+  syntax: "<percentage>";
+  initial-value: 100%;
+  inherits: true;
+}
+
+@property --cap-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: true;
+}
