@@ -7,11 +7,5 @@ browser.runtime.onMessage.addListener(async (message) => {
   if (message.type === "RESET_TIMER") {
     timeUpSound.play();
     console.log("time up sound played");
-
-    if (message.completedSessions) {
-      const now = new Date();
-      await completedSessionsStorage.setValue(message.completedSessions);
-      await sessionsLastUpdated.setValue(now);
-    }
   }
 });

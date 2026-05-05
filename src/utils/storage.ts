@@ -24,9 +24,9 @@ export const completedSessionsStorage = storage.defineItem<CompletedSessions>(
   },
 );
 
-export const sessionsLastUpdated = storage.defineItem<Date>(
+export const sessionsLastUpdated = storage.defineItem<number>(
   "sync:sessionsLastUpdated",
   {
-    defaultValue: new Date(0),
+    defaultValue: 0,
   },
 );

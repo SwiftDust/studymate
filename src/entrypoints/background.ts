@@ -11,10 +11,15 @@ export let completedSessions = {
 let interval: NodeJS.Timeout | null = null;
 let timeBetween: number;
 
-const sameLocalDay = (a: Date, b: Date) =>
-  a.getFullYear() === b.getFullYear() &&
-  a.getMonth() === b.getMonth() &&
-  a.getDate() === b.getDate();
+const sameLocalDay = (a: number | Date, b: number | Date) => {
+  const dateA = new Date(a);
+  const dateB = new Date(b);
+  return (
+    dateA.getFullYear() === dateB.getFullYear() &&
+    dateA.getMonth() === dateB.getMonth() &&
+    dateA.getDate() === dateB.getDate()
+  );
+};
 
 export default defineBackground(async () => {
   console.log("info> started StudyMate", { id: browser.runtime.id });
@@ -33,14 +38,20 @@ export default defineBackground(async () => {
   }
 
   completedSessions = await completedSessionsStorage.getValue();
-  const lastUpdated = await sessionsLastUpdated.getValue();
+  let lastUpdated = await sessionsLastUpdated.getValue();
   const now = new Date();
-  if (!sameLocalDay(lastUpdated, now)) {
-    completedSessions = {
-      completedPomodoros: 0,
-      completedShortBreaks: 0,
-      completedLongBreaks: 0,
-    };
+
+  if (lastUpdated === 0 || !sameLocalDay(lastUpdated, now)) {
+    if (lastUpdated !== 0) {
+      completedSessions = {
+        completedPomodoros: 0,
+        completedShortBreaks: 0,
+        completedLongBreaks: 0,
+      };
+      await completedSessionsStorage.setValue(completedSessions);
+    }
+    lastUpdated = now.getTime();
+    await sessionsLastUpdated.setValue(lastUpdated);
   }
 
   const playTimer = (time: number) => {
@@ -55,13 +66,15 @@ export default defineBackground(async () => {
       },
       async () => {
         const now = new Date();
-        const lastUpdated = await sessionsLastUpdated.getValue();
-        if (!sameLocalDay(lastUpdated, now)) {
+        const currentLastUpdated = await sessionsLastUpdated.getValue();
+
+        if (!sameLocalDay(currentLastUpdated, now)) {
           completedSessions = {
             completedPomodoros: 0,
             completedShortBreaks: 0,
             completedLongBreaks: 0,
           };
+          await sessionsLastUpdated.setValue(now.getTime());
         }
 
         if (timerType === "POMODORO") {
@@ -71,6 +84,8 @@ export default defineBackground(async () => {
         } else if (timerType === "LONG_BREAK") {
           completedSessions.completedLongBreaks += 1;
         }
+
+        await completedSessionsStorage.setValue(completedSessions);
 
         browser.runtime.sendMessage({
           type: "RESET_TIMER",
