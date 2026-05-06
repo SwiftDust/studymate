@@ -1,0 +1,29 @@
+vitest.config.ts
+  h_58f058beb98918 1,4,6
+  1b8da7a911f26147 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "d48b1e7ee2e837df35d65f77e3d578ed143996db",
+  "prompts": {
+    "1b8da7a911f26147": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "c355d447-87cf-4a03-80f3-2d7fbd13be31",
+        "model": "unknown"
+      },
+      "human_author": "Mart",
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 1,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  },
+  "humans": {
+    "h_58f058beb98918": {
+      "author": "Mart"
+    }
+  }
+}
