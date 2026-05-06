@@ -1,5 +1,6 @@
 import { countdown } from "@/utils/countdown";
 import { completedSessionsStorage, sessionsLastUpdated } from "@/utils/storage";
+import { sameLocalDay } from "@/utils/sameLocalDay";
 
 export let timerType: "POMODORO" | "SHORT_BREAK" | "LONG_BREAK" = "POMODORO";
 export let completedSessions = {
@@ -10,16 +11,6 @@ export let completedSessions = {
 
 let interval: NodeJS.Timeout | null = null;
 let timeBetween: number;
-
-const sameLocalDay = (a: number | Date, b: number | Date) => {
-  const dateA = new Date(a);
-  const dateB = new Date(b);
-  return (
-    dateA.getFullYear() === dateB.getFullYear() &&
-    dateA.getMonth() === dateB.getMonth() &&
-    dateA.getDate() === dateB.getDate()
-  );
-};
 
 export default defineBackground(async () => {
   console.log("info> started StudyMate", { id: browser.runtime.id });
