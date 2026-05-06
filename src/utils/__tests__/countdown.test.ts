@@ -40,9 +40,11 @@ describe("countdown utility", () => {
     const onFinish = vi.fn();
 
     countdown(-100, undefined, onFinish);
+    expect(onFinish).toHaveBeenCalledTimes(1);
 
     vi.advanceTimersByTime(500);
 
-    expect(onFinish).toHaveBeenCalled();
+    expect(onFinish).toHaveBeenCalledTimes(1);
+  });
   });
 });
