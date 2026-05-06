@@ -8,7 +8,7 @@
     import playIcon from "~/assets/icon/play.png";
     import timeUp from "~/assets/sound/time-up.wav";
     import { onMount } from "svelte";
-    import { updateTime } from "../state.svelte";
+    import { timerRing, updateTime } from "../state.svelte";
 
     const timeUpSound = new Audio(timeUp);
 
@@ -62,6 +62,9 @@
 
         const { minutes, seconds } = getMinutesSeconds(timeBetween);
         updateTime(minutes, seconds);
+        const total = Math.max(timeBetween, 1);
+        timerRing.totalMs = total;
+        timerRing.remainingMs = timeBetween;
     };
 
     const resetTimer = () => {
@@ -104,6 +107,7 @@
     $effect(() => {
         const { minutes, seconds } = getMinutesSeconds(timeBetween);
         updateTime(minutes, seconds);
+        timerRing.remainingMs = timeBetween;
     });
 
     const handleClick = async () => {

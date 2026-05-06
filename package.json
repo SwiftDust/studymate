@@ -3,7 +3,7 @@
   "displayName": "StudyMate — ADHD-friendly study timer",
   "description": "StudyMate — Pomodoro timer 🍅, motivational quotes 💬 and a funny parrot 🦜 to help you study more effectively",
   "private": true,
-  "version": "0.1.5",
+  "version": "0.1.6",
   "type": "module",
   "scripts": {
     "dev": "wxt",

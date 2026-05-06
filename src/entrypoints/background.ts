@@ -1,5 +1,6 @@
 import { countdown } from "@/utils/countdown";
 import { completedSessionsStorage, sessionsLastUpdated } from "@/utils/storage";
+import { sameLocalDay } from "@/utils/sameLocalDay";
 
 export let timerType: "POMODORO" | "SHORT_BREAK" | "LONG_BREAK" = "POMODORO";
 export let completedSessions = {
@@ -11,10 +12,26 @@ export let completedSessions = {
 let interval: NodeJS.Timeout | null = null;
 let timeBetween: number;
 
-const sameLocalDay = (a: Date, b: Date) =>
-  a.getFullYear() === b.getFullYear() &&
-  a.getMonth() === b.getMonth() &&
-  a.getDate() === b.getDate();
+async function resetDailySessionsIfNeeded() {
+  let sessions = await completedSessionsStorage.getValue();
+  let lastUpdated = await sessionsLastUpdated.getValue();
+  const now = new Date();
+
+  if (lastUpdated === 0 || !sameLocalDay(lastUpdated, now)) {
+    if (lastUpdated !== 0) {
+      sessions = {
+        completedPomodoros: 0,
+        completedShortBreaks: 0,
+        completedLongBreaks: 0,
+      };
+      await completedSessionsStorage.setValue(sessions);
+    }
+    lastUpdated = now.getTime();
+    await sessionsLastUpdated.setValue(lastUpdated);
+  }
+
+  return sessions;
+}
 
 export default defineBackground(async () => {
   console.log("info> started StudyMate", { id: browser.runtime.id });
@@ -32,16 +49,7 @@ export default defineBackground(async () => {
     console.error("offscreen error:", e);
   }
 
-  completedSessions = await completedSessionsStorage.getValue();
-  const lastUpdated = await sessionsLastUpdated.getValue();
-  const now = new Date();
-  if (!sameLocalDay(lastUpdated, now)) {
-    completedSessions = {
-      completedPomodoros: 0,
-      completedShortBreaks: 0,
-      completedLongBreaks: 0,
-    };
-  }
+  completedSessions = await resetDailySessionsIfNeeded();
 
   const playTimer = (time: number) => {
     interval = countdown(
@@ -55,13 +63,15 @@ export default defineBackground(async () => {
       },
       async () => {
         const now = new Date();
-        const lastUpdated = await sessionsLastUpdated.getValue();
-        if (!sameLocalDay(lastUpdated, now)) {
+        const currentLastUpdated = await sessionsLastUpdated.getValue();
+
+        if (!sameLocalDay(currentLastUpdated, now)) {
           completedSessions = {
             completedPomodoros: 0,
             completedShortBreaks: 0,
             completedLongBreaks: 0,
           };
+          await sessionsLastUpdated.setValue(now.getTime());
         }
 
         if (timerType === "POMODORO") {
@@ -71,6 +81,8 @@ export default defineBackground(async () => {
         } else if (timerType === "LONG_BREAK") {
           completedSessions.completedLongBreaks += 1;
         }
+
+        await completedSessionsStorage.setValue(completedSessions);
 
         browser.runtime.sendMessage({
           type: "RESET_TIMER",
@@ -84,8 +96,9 @@ export default defineBackground(async () => {
     if (interval !== null) clearInterval(interval);
   };
 
-  browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     if (message.type === "GET_STATE") {
+      completedSessions = await resetDailySessionsIfNeeded();
       sendResponse({ timerType, completedSessions });
     } else if (message.type === "START_TIMER") {
       playTimer(message.time);
