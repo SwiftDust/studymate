@@ -12,6 +12,27 @@ export let completedSessions = {
 let interval: NodeJS.Timeout | null = null;
 let timeBetween: number;
 
+async function resetDailySessionsIfNeeded() {
+  let sessions = await completedSessionsStorage.getValue();
+  let lastUpdated = await sessionsLastUpdated.getValue();
+  const now = new Date();
+
+  if (lastUpdated === 0 || !sameLocalDay(lastUpdated, now)) {
+    if (lastUpdated !== 0) {
+      sessions = {
+        completedPomodoros: 0,
+        completedShortBreaks: 0,
+        completedLongBreaks: 0,
+      };
+      await completedSessionsStorage.setValue(sessions);
+    }
+    lastUpdated = now.getTime();
+    await sessionsLastUpdated.setValue(lastUpdated);
+  }
+
+  return sessions;
+}
+
 export default defineBackground(async () => {
   console.log("info> started StudyMate", { id: browser.runtime.id });
 
@@ -28,22 +49,7 @@ export default defineBackground(async () => {
     console.error("offscreen error:", e);
   }
 
-  completedSessions = await completedSessionsStorage.getValue();
-  let lastUpdated = await sessionsLastUpdated.getValue();
-  const now = new Date();
-
-  if (lastUpdated === 0 || !sameLocalDay(lastUpdated, now)) {
-    if (lastUpdated !== 0) {
-      completedSessions = {
-        completedPomodoros: 0,
-        completedShortBreaks: 0,
-        completedLongBreaks: 0,
-      };
-      await completedSessionsStorage.setValue(completedSessions);
-    }
-    lastUpdated = now.getTime();
-    await sessionsLastUpdated.setValue(lastUpdated);
-  }
+  completedSessions = await resetDailySessionsIfNeeded();
 
   const playTimer = (time: number) => {
     interval = countdown(
@@ -90,8 +96,9 @@ export default defineBackground(async () => {
     if (interval !== null) clearInterval(interval);
   };
 
-  browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     if (message.type === "GET_STATE") {
+      completedSessions = await resetDailySessionsIfNeeded();
       sendResponse({ timerType, completedSessions });
     } else if (message.type === "START_TIMER") {
       playTimer(message.time);
