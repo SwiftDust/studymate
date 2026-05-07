@@ -56,13 +56,41 @@ body {
 }
 
 h1 {
-    font-family: "Manrope", sans-serif;
+    font-family: Manrope, sans-serif;
     font-size: 3.2em;
     line-height: 1.1;
 }
 
-.timer-type {
+.timer-selection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     margin-top: 2rem;
+}
+
+.reset-container {
+    width: 306px;
+    text-align: left;
+    margin-top: -18px;
+}
+
+.reset-container button {
+    font-size: 0.75rem;
+    font-family: Manrope, sans-serif;
+    font-weight: 500;
+    font-style: italic;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
+    text-decoration: inherit;
+    cursor: pointer;
+}
+
+.reset-container button:hover {
+    opacity: 1;
 }
 
 .pomodoro {

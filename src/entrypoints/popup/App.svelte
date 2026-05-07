@@ -18,7 +18,10 @@
 
     const ringProgress = $derived(
         timerRing.totalMs > 0
-            ? Math.min(1, Math.max(0, timerRing.remainingMs / timerRing.totalMs))
+            ? Math.min(
+                  1,
+                  Math.max(0, timerRing.remainingMs / timerRing.totalMs),
+              )
             : 1,
     );
 </script>
@@ -32,8 +35,24 @@
         <div class="switch-mode"><SwitchMode /></div>
     </div>
 
-    <div class="timer-type">
+    <div class="timer-selection">
         <TimerType bind:timerType bind:buttonState bind:completedSessions />
+        <div class="reset-container">
+            <button
+                type="button"
+                onclick={async () => {
+                    const response = await browser.runtime.sendMessage({
+                        type: "RESET_SESSIONS",
+                    });
+
+                    if (response && response.completedSessions) {
+                        completedSessions = response.completedSessions;
+                    }
+                }}
+            >
+                Reset finished timer count
+            </button>
+        </div>
     </div>
     <div class="pomodoro">
         <TimerRing progress={ringProgress}>

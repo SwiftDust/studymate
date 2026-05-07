@@ -1,3 +1,11 @@
+## Changelog for v0.1.7
+- Added a "reset timers" link
+
+### Minor changes
+- Fix an issue in ci/cd that prevents autotriggering the release build
+
+<details>
+<summary>Looking for older changelogs? Click here!</summary>
 ## Changelog for v0.1.6
 - Added a timer ring component
 
@@ -9,8 +17,6 @@
 ### Bug fixes
 - Fixed an issue where the timer count wouldn't reset correctly. This issue was introduced in v0.1.5
 
-<details>
-<summary>Looking for older changelogs? Click here!</summary>
 ## Changelog for v0.1.5
 
 - Added a switch where you can switch to light and dark mode, and auto-syncing with device theme to select the default one.

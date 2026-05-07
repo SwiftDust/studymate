@@ -96,24 +96,59 @@ export default defineBackground(async () => {
     if (interval !== null) clearInterval(interval);
   };
 
-  browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
-    if (message.type === "GET_STATE") {
-      completedSessions = await resetDailySessionsIfNeeded();
-      sendResponse({ timerType, completedSessions });
-    } else if (message.type === "START_TIMER") {
-      playTimer(message.time);
-      sendResponse({ status: "timerStarted", time: message.time });
-    } else if (message.type === "PAUSE_TIMER") {
-      pauseTimer();
-      sendResponse({ status: "timerPaused", time: message.time });
-    } else if (message.type === "INIT_TIMER") {
-      timerType = message.timerType;
-      browser.runtime.sendMessage({
-        type: "INIT_TIMER",
-        timerType: message.timerType,
-      });
-    }
+  browser.runtime.onMessage.addListener(
+    (message, sender, sendResponse) => {
+      if (message.type === "GET_STATE") {
+        (async () => {
+          const now = new Date();
+          const currentLastUpdated = await sessionsLastUpdated.getValue();
 
-    return true;
-  });
+          if (
+            currentLastUpdated !== 0 &&
+            !sameLocalDay(currentLastUpdated, now)
+          ) {
+            completedSessions = {
+              completedPomodoros: 0,
+              completedShortBreaks: 0,
+              completedLongBreaks: 0,
+            };
+            await completedSessionsStorage.setValue(completedSessions);
+            await sessionsLastUpdated.setValue(now.getTime());
+          }
+
+          sendResponse({ timerType, completedSessions });
+        })();
+        return true;
+      } else if (message.type === "START_TIMER") {
+        playTimer(message.time);
+        sendResponse({ status: "timerStarted", time: message.time });
+        return true;
+      } else if (message.type === "PAUSE_TIMER") {
+        pauseTimer();
+        sendResponse({ status: "timerPaused", time: message.time });
+        return true;
+      } else if (message.type === "INIT_TIMER") {
+        timerType = message.timerType;
+        browser.runtime.sendMessage({
+          type: "INIT_TIMER",
+          timerType: message.timerType,
+        });
+        sendResponse({ status: "inited", timerType });
+      } else if (message.type === "RESET_SESSIONS") {
+        (async () => {
+          completedSessions = {
+            completedPomodoros: 0,
+            completedShortBreaks: 0,
+            completedLongBreaks: 0,
+          };
+          await completedSessionsStorage.setValue(completedSessions);
+          await sessionsLastUpdated.setValue(Date.now());
+          sendResponse({ completedSessions });
+        })();
+        return true;
+      }
+
+      return false;
+    },
+  );
 });
