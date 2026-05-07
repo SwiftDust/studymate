@@ -12,6 +12,27 @@ export let completedSessions = {
 let interval: NodeJS.Timeout | null = null;
 let timeBetween: number;
 
+async function resetDailySessionsIfNeeded() {
+  let sessions = await completedSessionsStorage.getValue();
+  let lastUpdated = await sessionsLastUpdated.getValue();
+  const now = new Date();
+
+  if (lastUpdated === 0 || !sameLocalDay(lastUpdated, now)) {
+    if (lastUpdated !== 0) {
+      sessions = {
+        completedPomodoros: 0,
+        completedShortBreaks: 0,
+        completedLongBreaks: 0,
+      };
+      await completedSessionsStorage.setValue(sessions);
+    }
+    lastUpdated = now.getTime();
+    await sessionsLastUpdated.setValue(lastUpdated);
+  }
+
+  return sessions;
+}
+
 export default defineBackground(async () => {
   console.log("info> started StudyMate", { id: browser.runtime.id });
 
@@ -28,22 +49,7 @@ export default defineBackground(async () => {
     console.error("offscreen error:", e);
   }
 
-  completedSessions = await completedSessionsStorage.getValue();
-  let lastUpdated = await sessionsLastUpdated.getValue();
-  const now = new Date();
-
-  if (lastUpdated === 0 || !sameLocalDay(lastUpdated, now)) {
-    if (lastUpdated !== 0) {
-      completedSessions = {
-        completedPomodoros: 0,
-        completedShortBreaks: 0,
-        completedLongBreaks: 0,
-      };
-      await completedSessionsStorage.setValue(completedSessions);
-    }
-    lastUpdated = now.getTime();
-    await sessionsLastUpdated.setValue(lastUpdated);
-  }
+  completedSessions = await resetDailySessionsIfNeeded();
 
   const playTimer = (time: number) => {
     interval = countdown(
@@ -90,48 +96,53 @@ export default defineBackground(async () => {
     if (interval !== null) clearInterval(interval);
   };
 
-  browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.type === "GET_STATE") {
-      (async () => {
-        const now = new Date();
-        const currentLastUpdated = await sessionsLastUpdated.getValue();
+  browser.runtime.onMessage.addListener(
+    async (message, sender, sendResponse) => {
+      if (message.type === "GET_STATE") {
+        (async () => {
+          const now = new Date();
+          const currentLastUpdated = await sessionsLastUpdated.getValue();
 
-        if (currentLastUpdated !== 0 && !sameLocalDay(currentLastUpdated, now)) {
-          completedSessions = {
-            completedPomodoros: 0,
-            completedShortBreaks: 0,
-            completedLongBreaks: 0,
-          };
-          await completedSessionsStorage.setValue(completedSessions);
-          await sessionsLastUpdated.setValue(now.getTime());
-        }
+          if (
+            currentLastUpdated !== 0 &&
+            !sameLocalDay(currentLastUpdated, now)
+          ) {
+            completedSessions = {
+              completedPomodoros: 0,
+              completedShortBreaks: 0,
+              completedLongBreaks: 0,
+            };
+            await completedSessionsStorage.setValue(completedSessions);
+            await sessionsLastUpdated.setValue(now.getTime());
+          }
 
-        sendResponse({ timerType, completedSessions });
-      })();
+          sendResponse({ timerType, completedSessions });
+        })();
+        return true;
+      } else if (message.type === "START_TIMER") {
+        playTimer(message.time);
+        sendResponse({ status: "timerStarted", time: message.time });
+      } else if (message.type === "PAUSE_TIMER") {
+        pauseTimer();
+        sendResponse({ status: "timerPaused", time: message.time });
+      } else if (message.type === "INIT_TIMER") {
+        timerType = message.timerType;
+        browser.runtime.sendMessage({
+          type: "INIT_TIMER",
+          timerType: message.timerType,
+        });
+      } else if (message.type === "RESET_SESSIONS") {
+        completedSessions = {
+          completedPomodoros: 0,
+          completedShortBreaks: 0,
+          completedLongBreaks: 0,
+        };
+        completedSessionsStorage.setValue(completedSessions);
+        sessionsLastUpdated.setValue(Date.now());
+        sendResponse({ completedSessions });
+      }
+
       return true;
-    } else if (message.type === "START_TIMER") {
-      playTimer(message.time);
-      sendResponse({ status: "timerStarted", time: message.time });
-    } else if (message.type === "PAUSE_TIMER") {
-      pauseTimer();
-      sendResponse({ status: "timerPaused", time: message.time });
-    } else if (message.type === "INIT_TIMER") {
-      timerType = message.timerType;
-      browser.runtime.sendMessage({
-        type: "INIT_TIMER",
-        timerType: message.timerType,
-      });
-    } else if (message.type === "RESET_SESSIONS") {
-      completedSessions = {
-        completedPomodoros: 0,
-        completedShortBreaks: 0,
-        completedLongBreaks: 0,
-      };
-      completedSessionsStorage.setValue(completedSessions);
-      sessionsLastUpdated.setValue(Date.now());
-      sendResponse({ completedSessions });
-    }
-
-    return true;
-  });
+    },
+  );
 });
