@@ -38,8 +38,8 @@
     <div class="timer-selection">
         <TimerType bind:timerType bind:buttonState bind:completedSessions />
         <div class="reset-container">
-            <a
-                href="#"
+            <button
+                type="button"
                 onclick={async () => {
                     const response = await browser.runtime.sendMessage({
                         type: "RESET_SESSIONS",
@@ -51,7 +51,7 @@
                 }}
             >
                 Reset finished timer count
-            </a>
+            </button>
         </div>
     </div>
     <div class="pomodoro">

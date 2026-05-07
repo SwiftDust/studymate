@@ -97,7 +97,7 @@ export default defineBackground(async () => {
   };
 
   browser.runtime.onMessage.addListener(
-    async (message, sender, sendResponse) => {
+    (message, sender, sendResponse) => {
       if (message.type === "GET_STATE") {
         (async () => {
           const now = new Date();
@@ -122,27 +122,33 @@ export default defineBackground(async () => {
       } else if (message.type === "START_TIMER") {
         playTimer(message.time);
         sendResponse({ status: "timerStarted", time: message.time });
+        return true;
       } else if (message.type === "PAUSE_TIMER") {
         pauseTimer();
         sendResponse({ status: "timerPaused", time: message.time });
+        return true;
       } else if (message.type === "INIT_TIMER") {
         timerType = message.timerType;
         browser.runtime.sendMessage({
           type: "INIT_TIMER",
           timerType: message.timerType,
         });
+        sendResponse({ status: "inited", timerType });
       } else if (message.type === "RESET_SESSIONS") {
-        completedSessions = {
-          completedPomodoros: 0,
-          completedShortBreaks: 0,
-          completedLongBreaks: 0,
-        };
-        completedSessionsStorage.setValue(completedSessions);
-        sessionsLastUpdated.setValue(Date.now());
-        sendResponse({ completedSessions });
+        (async () => {
+          completedSessions = {
+            completedPomodoros: 0,
+            completedShortBreaks: 0,
+            completedLongBreaks: 0,
+          };
+          await completedSessionsStorage.setValue(completedSessions);
+          await sessionsLastUpdated.setValue(Date.now());
+          sendResponse({ completedSessions });
+        })();
+        return true;
       }
 
-      return true;
+      return false;
     },
   );
 });
