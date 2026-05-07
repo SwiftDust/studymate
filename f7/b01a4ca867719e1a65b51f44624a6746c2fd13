@@ -1,0 +1,23 @@
+src/entrypoints/background.ts
+  e52ec538b7fbeac1 102-142
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "f7b01a4ca867719e1a65b51f44624a6746c2fd13",
+  "prompts": {
+    "e52ec538b7fbeac1": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "ffed98ae-9743-406b-9a3c-30c9226a3a8d",
+        "model": "unknown"
+      },
+      "human_author": "Mart",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 29,
+      "overriden_lines": 0
+    }
+  }
+}
