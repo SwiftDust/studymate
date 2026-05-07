@@ -1,0 +1,40 @@
+src/entrypoints/background.ts
+  e52ec538b7fbeac1 95-111,124-132
+src/entrypoints/popup/App.svelte
+  f6888ec6b6f6d099 38,40-55
+src/entrypoints/popup/app.css
+  f6888ec6b6f6d099 64-67,71,73,75-87
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "f520f03ebec2c000e465086ac6e2ece3b64adecc",
+  "prompts": {
+    "e52ec538b7fbeac1": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "ffed98ae-9743-406b-9a3c-30c9226a3a8d",
+        "model": "unknown"
+      },
+      "human_author": "Mart",
+      "messages": [],
+      "total_additions": 33,
+      "total_deletions": 13,
+      "accepted_lines": 26,
+      "overriden_lines": 0
+    },
+    "f6888ec6b6f6d099": {
+      "agent_id": {
+        "tool": "gemini",
+        "id": "fa04b9ce-edd3-4b14-817a-df9727761e48",
+        "model": "unknown"
+      },
+      "human_author": "Mart",
+      "messages": [],
+      "total_additions": 36,
+      "total_deletions": 16,
+      "accepted_lines": 33,
+      "overriden_lines": 2
+    }
+  }
+}
