@@ -92,7 +92,23 @@ export default defineBackground(async () => {
 
   browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === "GET_STATE") {
-      sendResponse({ timerType, completedSessions });
+      (async () => {
+        const now = new Date();
+        const currentLastUpdated = await sessionsLastUpdated.getValue();
+
+        if (currentLastUpdated !== 0 && !sameLocalDay(currentLastUpdated, now)) {
+          completedSessions = {
+            completedPomodoros: 0,
+            completedShortBreaks: 0,
+            completedLongBreaks: 0,
+          };
+          await completedSessionsStorage.setValue(completedSessions);
+          await sessionsLastUpdated.setValue(now.getTime());
+        }
+
+        sendResponse({ timerType, completedSessions });
+      })();
+      return true;
     } else if (message.type === "START_TIMER") {
       playTimer(message.time);
       sendResponse({ status: "timerStarted", time: message.time });
@@ -105,6 +121,15 @@ export default defineBackground(async () => {
         type: "INIT_TIMER",
         timerType: message.timerType,
       });
+    } else if (message.type === "RESET_SESSIONS") {
+      completedSessions = {
+        completedPomodoros: 0,
+        completedShortBreaks: 0,
+        completedLongBreaks: 0,
+      };
+      completedSessionsStorage.setValue(completedSessions);
+      sessionsLastUpdated.setValue(Date.now());
+      sendResponse({ completedSessions });
     }
 
     return true;
